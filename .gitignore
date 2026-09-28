@@ -1,0 +1,15 @@
+# colcon の生成物（各自 colcon build で作る）
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+
+# Python
+__pycache__/
+*.pyc
+
+# エディタ・OS
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store

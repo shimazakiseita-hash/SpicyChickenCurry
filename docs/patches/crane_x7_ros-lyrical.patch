@@ -1,0 +1,167 @@
+diff --git a/crane_x7_control/CMakeLists.txt b/crane_x7_control/CMakeLists.txt
+index 78f9ffd..76604dc 100644
+--- a/crane_x7_control/CMakeLists.txt
++++ b/crane_x7_control/CMakeLists.txt
+@@ -32,12 +32,12 @@ target_include_directories(
+   PRIVATE
+   include
+ )
+-ament_target_dependencies(
++target_link_libraries(
+   ${LIBRARY_NAME}
+-  hardware_interface
+-  pluginlib
+-  rclcpp
+-  rt_manipulators_cpp
++  hardware_interface::hardware_interface
++  pluginlib::pluginlib
++  rclcpp::rclcpp
++  rt_manipulators_cpp::rt_manipulators_cpp
+ )
+ 
+ pluginlib_export_plugin_description_file(hardware_interface crane_x7_hardware.xml)
+diff --git a/crane_x7_control/include/crane_x7_control/crane_x7_hardware.hpp b/crane_x7_control/include/crane_x7_control/crane_x7_hardware.hpp
+index 5882c38..d4f17b2 100644
+--- a/crane_x7_control/include/crane_x7_control/crane_x7_hardware.hpp
++++ b/crane_x7_control/include/crane_x7_control/crane_x7_hardware.hpp
+@@ -43,7 +43,8 @@ public:
+   ~CraneX7Hardware();
+ 
+   CRANE_X7_CONTROL_PUBLIC
+-  CallbackReturn on_init(const hardware_interface::HardwareInfo & info) override;
++  CallbackReturn on_init(
++    const hardware_interface::HardwareComponentInterfaceParams & params) override;
+ 
+   CRANE_X7_CONTROL_PUBLIC
+   std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
+diff --git a/crane_x7_control/src/crane_x7_hardware.cpp b/crane_x7_control/src/crane_x7_hardware.cpp
+index 8be9694..964964e 100644
+--- a/crane_x7_control/src/crane_x7_hardware.cpp
++++ b/crane_x7_control/src/crane_x7_hardware.cpp
+@@ -47,9 +47,9 @@ CraneX7Hardware::~CraneX7Hardware()
+ }
+ 
+ CallbackReturn CraneX7Hardware::on_init(
+-  const hardware_interface::HardwareInfo & info)
++  const hardware_interface::HardwareComponentInterfaceParams & params)
+ {
+-  if (hardware_interface::SystemInterface::on_init(info) != CallbackReturn::SUCCESS) {
++  if (hardware_interface::SystemInterface::on_init(params) != CallbackReturn::SUCCESS) {
+     return CallbackReturn::ERROR;
+   }
+ 
+diff --git a/crane_x7_examples/CMakeLists.txt b/crane_x7_examples/CMakeLists.txt
+index 26ca21f..27db72a 100644
+--- a/crane_x7_examples/CMakeLists.txt
++++ b/crane_x7_examples/CMakeLists.txt
+@@ -24,6 +24,8 @@ find_package(image_transport REQUIRED)
+ find_package(message_filters REQUIRED)
+ find_package(moveit_ros_planning_interface REQUIRED)
+ find_package(OpenCV REQUIRED COMPONENTS core)
++# Lyrical (VTK 9.5): VTK::jsoncpp が参照する JsonCpp::JsonCpp を先に定義しておく
++find_package(jsoncpp REQUIRED)
+ find_package(pcl_conversions REQUIRED)
+ find_package(pcl_ros REQUIRED)
+ find_package(rclcpp REQUIRED)
+@@ -43,18 +45,18 @@ set(executable_list
+ )
+ foreach(loop_var IN LISTS executable_list)
+   add_executable(${loop_var} src/${loop_var}.cpp)
+-  ament_target_dependencies(${loop_var}
+-    cv_bridge
+-    geometry_msgs
+-    image_geometry
+-    image_transport
+-    message_filters
+-    moveit_ros_planning_interface
+-    OpenCV
+-    pcl_ros
+-    pcl_conversions
+-    rclcpp
+-    tf2_geometry_msgs
++  target_link_libraries(${loop_var}
++    ${cv_bridge_TARGETS}
++    ${geometry_msgs_TARGETS}
++    ${image_geometry_TARGETS}
++    ${image_transport_TARGETS}
++    ${message_filters_TARGETS}
++    ${moveit_ros_planning_interface_TARGETS}
++    ${OpenCV_LIBS}
++    ${pcl_ros_TARGETS}
++    ${pcl_conversions_TARGETS}
++    ${rclcpp_TARGETS}
++    ${tf2_geometry_msgs_TARGETS}
+   )
+ 
+   install(TARGETS
+diff --git a/crane_x7_examples/src/aruco_detection.cpp b/crane_x7_examples/src/aruco_detection.cpp
+index 8a32b17..4db806a 100644
+--- a/crane_x7_examples/src/aruco_detection.cpp
++++ b/crane_x7_examples/src/aruco_detection.cpp
+@@ -48,7 +48,8 @@ public:
+ 
+     // ArUcoマーカのデータセットを読み込む
+     // DICT_6x6_50は6x6ビットのマーカが50個収録されたもの
+-    marker_dict_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_50);
++    marker_dict_ = cv::makePtr<cv::aruco::Dictionary>(
++      cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_50));
+ 
+     tf_broadcaster_ =
+       std::make_unique<tf2_ros::TransformBroadcaster>(*this);
+diff --git a/crane_x7_examples/src/color_detection.cpp b/crane_x7_examples/src/color_detection.cpp
+index 87433f6..687e2c2 100644
+--- a/crane_x7_examples/src/color_detection.cpp
++++ b/crane_x7_examples/src/color_detection.cpp
+@@ -33,9 +33,9 @@
+ #include "image_geometry/pinhole_camera_model.hpp"
+ #include "image_transport/image_transport.hpp"
+ #include "image_transport/subscriber_filter.hpp"
+-#include "message_filters/subscriber.h"
+-#include "message_filters/synchronizer.h"
+-#include "message_filters/sync_policies/exact_time.h"
++#include "message_filters/subscriber.hpp"
++#include "message_filters/synchronizer.hpp"
++#include "message_filters/sync_policies/exact_time.hpp"
+ 
+ using std::placeholders::_1;
+ using std::placeholders::_2;
+@@ -49,7 +49,7 @@ public:
+   {
+     color_sub_.subscribe(this, "/camera/color/image_raw", "raw");
+     depth_sub_.subscribe(this, "/camera/aligned_depth_to_color/image_raw", "raw");
+-    info_sub_.subscribe(this, "/camera/color/camera_info");
++    info_sub_.subscribe(this, "/camera/color/camera_info", rclcpp::QoS(10));
+ 
+     sync_ = std::make_unique<message_filters::Synchronizer<ExactPolicy>>(
+       ExactPolicy(10), color_sub_, depth_sub_, info_sub_);
+diff --git a/crane_x7_gazebo/launch/crane_x7_with_table.launch.py b/crane_x7_gazebo/launch/crane_x7_with_table.launch.py
+index 4796ace..2e7c82b 100644
+--- a/crane_x7_gazebo/launch/crane_x7_with_table.launch.py
++++ b/crane_x7_gazebo/launch/crane_x7_with_table.launch.py
+@@ -94,18 +94,24 @@ def generate_launch_description():
+         arguments=['joint_state_controller'],
+     )
+ 
++    # Lyrical の gz_ros2_control では URDF 側の <parameters> がコントローラに渡らないため、
++    # spawner で直接パラメータファイルを読み込ませる
++    controllers_config = os.path.join(
++        get_package_share_directory('crane_x7_control'), 'config', 'crane_x7_controllers.yaml'
++    )
++
+     spawn_arm_controller = Node(
+         package='controller_manager',
+         executable='spawner',
+         output='screen',
+-        arguments=['crane_x7_arm_controller'],
++        arguments=['crane_x7_arm_controller', '--param-file', controllers_config],
+     )
+ 
+     spawn_gripper_controller = Node(
+         package='controller_manager',
+         executable='spawner',
+         output='screen',
+-        arguments=['crane_x7_gripper_controller'],
++        arguments=['crane_x7_gripper_controller', '--param-file', controllers_config],
+     )
+ 
+     bridge = Node(
