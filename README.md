@@ -46,6 +46,16 @@ ros2 launch crane_x7_examples example.launch.py example:=pose_groupstate use_sim
 
 `example:=` には `gripper_control` / `joint_values` / `cartesian_path` / `pick_and_place` なども指定できます。
 
+## MuJoCo（学習用）
+
+MuJoCo で学習し、Gazebo で見せる構成にしています。セットアップと使い方は [mujoco/README.md](mujoco/README.md) を参照してください。
+
+```bash
+python3 -m venv --system-site-packages .venv
+.venv/bin/pip install -r requirements.txt
+.venv/bin/python -m mujoco.viewer --mjcf=mujoco/models/crane_x7/scene.xml
+```
+
 ## トラブルシューティング
 
 ### VS Code のターミナルから起動すると RViz / Gazebo が落ちる

@@ -1,0 +1,7 @@
+# MuJoCo での学習用 (.venv にインストールする。手順は mujoco/README.md)
+# PyTorch は CPU 版を使うので --extra-index-url を付けてインストールすること
+--extra-index-url https://download.pytorch.org/whl/cpu
+mujoco==3.14.0
+gymnasium==1.3.0
+stable-baselines3==2.9.0
+torch==2.14.0+cpu

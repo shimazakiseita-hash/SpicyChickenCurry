@@ -13,3 +13,9 @@ __pycache__/
 *.swp
 *~
 .DS_Store
+
+# Python 仮想環境（各自 requirements.txt から作る）
+.venv/
+
+# 学習結果（大きくなるので共有したいものだけ別途）
+mujoco/runs/
