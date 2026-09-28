@@ -56,6 +56,12 @@ python3 -m venv --system-site-packages .venv
 .venv/bin/python -m mujoco.viewer --mjcf=mujoco/models/crane_x7/scene.xml
 ```
 
+MuJoCo で学習した到達タスクの方策を Gazebo で動かすデモ（Gazebo を起動した状態で）:
+
+```bash
+ros2 launch crane_x7_rl reach_demo.launch.py policy_path:=$PWD/mujoco/policies/reach_v1.npz
+```
+
 ## トラブルシューティング
 
 ### VS Code のターミナルから起動すると RViz / Gazebo が落ちる
@@ -79,7 +85,8 @@ export XDG_DATA_DIRS="$XDG_DATA_DIRS_VSCODE_SNAP_ORIG" XDG_CONFIG_DIRS="$XDG_CON
 ros2_ws/src/
 ├── crane_x7_description/      # rt-net: URDF・メッシュ
 ├── crane_x7_ros/              # rt-net: 制御・MoveIt・Gazebo・サンプル（Lyrical 向けに修正済み）
-└── rt_manipulators_cpp_ros2/  # rt-net: 実機制御ライブラリ
+├── rt_manipulators_cpp_ros2/  # rt-net: 実機制御ライブラリ
+└── crane_x7_rl/               # チーム: MuJoCo で学習した方策を動かすノード
 ```
 
 チームで作るパッケージは `ros2_ws/src/` の下に追加してください。

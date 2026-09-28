@@ -35,6 +35,10 @@ ARM_JOINTS = [
 GRIPPER_JOINT = 'crane_x7_gripper_finger_a_joint'
 GRIPPER_MIMIC_JOINT = 'crane_x7_gripper_finger_b_joint'
 
+# 手先の基準点 (crane_x7_gripper_base_link 座標系)
+EE_BODY = 'crane_x7_gripper_base_link'
+EE_OFFSET = [0.0, 0.0, 0.07]
+
 # 位置制御アクチュエータのゲイン (Dynamixel の位置制御を近似)
 ARM_KP = 100.0
 GRIPPER_KP = 20.0
@@ -87,16 +91,40 @@ def build_spec() -> mujoco.MjSpec:
 
     # URDF の visual と collision が両方 geom になるので、役割を分ける
     # visual: 衝突なし (group 2)、collision: 表示しない (group 3)
+    # visual/wrist.stl と collision/wrist.stl のようにファイル名が同じだと、MuJoCo は
+    # 1 つのメッシュにまとめてしまう。visual 由来の geom は density=0 になるのでそれで見分け、
+    # collision 側には collision/ のメッシュを別名で割り当て直す
     for geom in spec.geoms:
-        mesh_name = geom.meshname or ''
-        mesh = spec.mesh(mesh_name) if mesh_name else None
-        path = mesh.file if mesh else ''
-        if path.startswith('visual/'):
+        if geom.type != mujoco.mjtGeom.mjGEOM_MESH:
+            continue
+        if geom.density == 0:
             geom.contype = 0
             geom.conaffinity = 0
             geom.group = 2
-        elif path.startswith('collision/'):
-            geom.group = 3
+            continue
+        geom.group = 3
+        stem = Path(spec.mesh(geom.meshname).file).stem
+        if not (MESH_DIR / 'collision' / f'{stem}.stl').exists():
+            continue
+        collision_name = f'collision_{stem}'
+        if spec.mesh(collision_name) is None:
+            mesh = spec.add_mesh()
+            mesh.name = collision_name
+            mesh.file = f'collision/{stem}.stl'
+        geom.meshname = collision_name
+
+    # 接触判定から外すリンクの組
+    # - 2 本の指: 親子関係ではないので、閉じたときに指どうしが接触判定されてしまう
+    # - 1 つ飛ばしのリンク: MuJoCo はメッシュを凸包で扱うため、関節を可動範囲の端まで曲げると
+    #   実機では当たらないのに接触判定される
+    for body1, body2 in [
+        ('crane_x7_gripper_finger_a_link', 'crane_x7_gripper_finger_b_link'),
+        ('crane_x7_upper_arm_revolute_part_link', 'crane_x7_lower_arm_revolute_part_link'),
+        ('crane_x7_lower_arm_revolute_part_link', 'crane_x7_gripper_base_link'),
+    ]:
+        exclude = spec.add_exclude()
+        exclude.bodyname1 = body1
+        exclude.bodyname2 = body2
 
     for joint in spec.joints:
         is_finger = joint.name in (GRIPPER_JOINT, GRIPPER_MIMIC_JOINT)
@@ -116,6 +144,14 @@ def build_spec() -> mujoco.MjSpec:
         act.ctrlrange = joint.range
         act.forcelimited = mujoco.mjtLimited.mjLIMITED_TRUE
         act.forcerange = [-efforts[name], efforts[name]]
+
+    # 手先の基準点: 2 本の指先の中間 (ROS 側では crane_x7_gripper_base_link から同じオフセットで求める)
+    ee_site = spec.body(EE_BODY).add_site()
+    ee_site.name = 'ee_site'
+    ee_site.pos = EE_OFFSET
+    ee_site.size = [0.005, 0, 0]
+    ee_site.rgba = [0, 1, 0, 1]
+    ee_site.group = 4
 
     # URDF の mimic (finger_b は finger_a に連動) は MuJoCo の読み込み時に等式拘束へ変換される
     assert any(eq.name1 == GRIPPER_MIMIC_JOINT for eq in spec.equalities), 'mimic が変換されていない'
@@ -143,6 +179,10 @@ def write_scene():
   <worldbody>
     <light pos="0 0 1.5" dir="0 0 -1" directional="true"/>
     <geom name="floor" size="0 0 0.05" type="plane" material="groundplane"/>
+    <!-- 到達タスクの目標位置の表示用 (当たり判定なし、コードから mocap_pos で動かす) -->
+    <body name="goal" mocap="true" pos="0.3 0 0.3">
+      <geom type="sphere" size="0.015" rgba="1 0.8 0 0.6" contype="0" conaffinity="0" group="1"/>
+    </body>
   </worldbody>
 </mujoco>
 """

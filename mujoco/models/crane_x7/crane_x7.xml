@@ -16,17 +16,27 @@
     <mesh name="wide_two_finger_gripper_actuator" file="visual/wide_two_finger_gripper_actuator.stl"/>
     <mesh name="wide_two_finger_gripper_finger_a" file="visual/wide_two_finger_gripper_finger_a.stl"/>
     <mesh name="wide_two_finger_gripper_finger_b" file="visual/wide_two_finger_gripper_finger_b.stl"/>
+    <mesh name="collision_mounting_plate" file="collision/mounting_plate.stl"/>
+    <mesh name="collision_base_fixed_part" file="collision/base_fixed_part.stl"/>
+    <mesh name="collision_rotating_link_type_1_fixed_part" file="collision/rotating_link_type_1_fixed_part.stl"/>
+    <mesh name="collision_rotating_link_type_1_revolute_part" file="collision/rotating_link_type_1_revolute_part.stl"/>
+    <mesh name="collision_rotating_link_type_2_fixed_part" file="collision/rotating_link_type_2_fixed_part.stl"/>
+    <mesh name="collision_rotating_link_type_2_revolute_part" file="collision/rotating_link_type_2_revolute_part.stl"/>
+    <mesh name="collision_wrist" file="collision/wrist.stl"/>
+    <mesh name="collision_wide_two_finger_gripper_actuator" file="collision/wide_two_finger_gripper_actuator.stl"/>
+    <mesh name="collision_wide_two_finger_gripper_finger_a" file="collision/wide_two_finger_gripper_finger_a.stl"/>
+    <mesh name="collision_wide_two_finger_gripper_finger_b" file="collision/wide_two_finger_gripper_finger_b.stl"/>
   </asset>
 
   <worldbody>
     <body name="base_link">
       <body name="crane_x7_mounting_plate_link">
         <geom quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="0.2 0.2 0.2 1" density="0" mesh="mounting_plate"/>
-        <geom quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="0.2 0.2 0.2 1" mesh="mounting_plate"/>
+        <geom quat="1 0 0 0" type="mesh" group="3" rgba="0.2 0.2 0.2 1" mesh="collision_mounting_plate"/>
         <body name="crane_x7_shoulder_fixed_part_link" pos="0 0 0.005">
           <inertial pos="-0.00673 -1e-06 0.0179" quat="7.41781e-05 0.643304 4.44837e-05 0.765611" mass="0.388" diaginertia="0.00059424 0.000483 0.00031676"/>
           <geom quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" density="0" mesh="base_fixed_part"/>
-          <geom quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" mesh="base_fixed_part"/>
+          <geom quat="1 0 0 0" type="mesh" group="3" rgba="1 0.3 0.3 1" mesh="collision_base_fixed_part"/>
           <body name="crane_x7_shoulder_revolute_part_link" pos="0 0 0.036">
             <inertial pos="0.000243 -0.000105 0.047" quat="0.999919 0.00366389 -0.00493351 -0.0111249" mass="0.253" diaginertia="0.00017901 0.000176003 8.95867e-05"/>
             <joint name="crane_x7_shoulder_fixed_part_pan_joint" range="-2.74017 2.74017" actuatorfrcrange="-10 10" armature="0.01" damping="1" frictionloss="0.2"/>
@@ -37,75 +47,76 @@
               <inertial pos="3.1e-05 1.9e-05 0.0342" quat="0.999982 -0.000828469 -0.000142495 0.00588086" mass="0.136" diaginertia="0.000168005 0.000133995 9.61999e-05"/>
               <joint name="crane_x7_shoulder_revolute_part_tilt_joint" range="-1.6057 1.6057" actuatorfrcrange="-10 10" armature="0.01" damping="1" frictionloss="0.2" axis="0 -1 0"/>
               <geom quat="0.707107 0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="0.95 0.95 0.95 1" density="0" mesh="rotating_link_type_1_fixed_part"/>
-              <geom quat="0.707107 0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="0.95 0.95 0.95 1" mesh="rotating_link_type_1_fixed_part"/>
+              <geom quat="0.707107 0.707106 0 0" type="mesh" group="3" rgba="0.95 0.95 0.95 1" mesh="collision_rotating_link_type_1_fixed_part"/>
               <body name="crane_x7_upper_arm_fixed_part_joint_cover_l_link" pos="0 0.0316 0">
                 <geom quat="0.707107 -0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" density="0" mesh="joint_cover"/>
-                <geom quat="0.707107 -0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" mesh="joint_cover"/>
+                <geom quat="0.707107 -0.707106 0 0" type="mesh" group="3" rgba="1 0.3 0.3 1" mesh="joint_cover"/>
               </body>
               <body name="crane_x7_upper_arm_fixed_part_joint_cover_r_link" pos="0 -0.0316 0">
                 <geom quat="0.707107 0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" density="0" mesh="joint_cover"/>
-                <geom quat="0.707107 0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" mesh="joint_cover"/>
+                <geom quat="0.707107 0.707106 0 0" type="mesh" group="3" rgba="1 0.3 0.3 1" mesh="joint_cover"/>
               </body>
               <body name="crane_x7_upper_arm_revolute_part_link" pos="0 0 0.065">
                 <inertial pos="-0.0137 -8.1e-05 0.0952" quat="0.711007 0.00875004 0.00712797 0.703094" mass="0.321" diaginertia="0.00188002 0.00182083 0.000158153"/>
                 <joint name="crane_x7_upper_arm_revolute_part_twist_joint" range="-2.74017 2.74017" actuatorfrcrange="-4 4" armature="0.01" damping="1" frictionloss="0.2"/>
                 <geom pos="0 0 0" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="0.95 0.95 0.95 1" density="0" mesh="rotating_link_type_1_revolute_part"/>
-                <geom pos="0 0 0" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="0.95 0.95 0.95 1" mesh="rotating_link_type_1_revolute_part"/>
+                <geom quat="1 0 0 0" type="mesh" group="3" rgba="0.95 0.95 0.95 1" mesh="collision_rotating_link_type_1_revolute_part"/>
                 <body name="crane_x7_lower_arm_fixed_part_link" pos="0 0 0.185">
                   <inertial pos="-0.00939 6.4e-05 0.0804" quat="0.705723 0.00112504 0.00623827 0.708459" mass="0.222" diaginertia="0.000503021 0.00048904 0.000113939"/>
                   <joint name="crane_x7_upper_arm_revolute_part_rotate_joint" range="-2.80998 1.74533e-05" actuatorfrcrange="-4 4" armature="0.01" damping="1" frictionloss="0.2" axis="0 -1 0"/>
                   <geom pos="0 0 0" quat="0.707107 0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="0.95 0.95 0.95 1" density="0" mesh="rotating_link_type_2_fixed_part"/>
-                  <geom pos="0 0 0" quat="0.707107 0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="0.95 0.95 0.95 1" mesh="rotating_link_type_2_fixed_part"/>
+                  <geom pos="0 0 0" quat="0.707107 0.707106 0 0" type="mesh" group="3" rgba="0.95 0.95 0.95 1" mesh="collision_rotating_link_type_2_fixed_part"/>
                   <body name="crane_x7_lower_arm_fixed_part_joint_cover_l_link" pos="0 0.025 0">
                     <geom quat="0.707107 -0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" density="0" mesh="joint_cover"/>
-                    <geom quat="0.707107 -0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" mesh="joint_cover"/>
+                    <geom quat="0.707107 -0.707106 0 0" type="mesh" group="3" rgba="1 0.3 0.3 1" mesh="joint_cover"/>
                   </body>
                   <body name="crane_x7_lower_arm_fixed_part_joint_cover_r_link" pos="0 -0.025 0">
                     <geom quat="0.707107 0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" density="0" mesh="joint_cover"/>
-                    <geom quat="0.707107 0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" mesh="joint_cover"/>
+                    <geom quat="0.707107 0.707106 0 0" type="mesh" group="3" rgba="1 0.3 0.3 1" mesh="joint_cover"/>
                   </body>
                   <body name="crane_x7_lower_arm_revolute_part_link" pos="0 0 0.121">
                     <inertial pos="-8.4e-05 0.000462 0.0637" quat="0.998786 -0.0491834 0.00125194 0.00227708" mass="0.207" diaginertia="0.000290002 0.000258668 8.58304e-05"/>
                     <joint name="crane_x7_lower_arm_fixed_part_joint" range="-2.74017 2.74017" actuatorfrcrange="-4 4" armature="0.01" damping="1" frictionloss="0.2"/>
                     <geom quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="0.95 0.95 0.95 1" density="0" mesh="rotating_link_type_2_revolute_part"/>
-                    <geom quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="0.95 0.95 0.95 1" mesh="rotating_link_type_2_revolute_part"/>
+                    <geom type="mesh" group="3" rgba="0.95 0.95 0.95 1" mesh="collision_rotating_link_type_2_revolute_part"/>
                     <body name="crane_x7_lower_arm_revolute_part_logo_text_l_link" pos="0 0.0345 0.095">
                       <geom quat="0.500001 -0.5 0.5 0.499999" type="mesh" contype="0" conaffinity="0" group="2" rgba="0.2 0.2 0.2 1" density="0" mesh="rtcorp_logo_name"/>
-                      <geom quat="0.500001 -0.5 0.5 0.499999" type="mesh" contype="0" conaffinity="0" group="2" rgba="0.2 0.2 0.2 1" mesh="rtcorp_logo_name"/>
+                      <geom quat="0.500001 -0.5 0.5 0.499999" type="mesh" group="3" rgba="0.2 0.2 0.2 1" mesh="rtcorp_logo_name"/>
                     </body>
                     <body name="crane_x7_lower_arm_revolute_part_logo_symbol_l_link" pos="0 0.0345 0.132">
                       <geom quat="0.500001 -0.5 0.5 0.499999" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" density="0" mesh="rtcorp_logo_rabbit"/>
-                      <geom quat="0.500001 -0.5 0.5 0.499999" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" mesh="rtcorp_logo_rabbit"/>
+                      <geom quat="0.500001 -0.5 0.5 0.499999" type="mesh" group="3" rgba="1 0.3 0.3 1" mesh="rtcorp_logo_rabbit"/>
                     </body>
                     <body name="crane_x7_lower_arm_revolute_part_logo_text_r_link" pos="0 -0.0345 0.104">
                       <geom quat="0.500001 0.5 -0.5 0.499999" type="mesh" contype="0" conaffinity="0" group="2" rgba="0.2 0.2 0.2 1" density="0" mesh="rtcorp_logo_name"/>
-                      <geom quat="0.500001 0.5 -0.5 0.499999" type="mesh" contype="0" conaffinity="0" group="2" rgba="0.2 0.2 0.2 1" mesh="rtcorp_logo_name"/>
+                      <geom quat="0.500001 0.5 -0.5 0.499999" type="mesh" group="3" rgba="0.2 0.2 0.2 1" mesh="rtcorp_logo_name"/>
                     </body>
                     <body name="crane_x7_lower_arm_revolute_part_logo_symbol_r_link" pos="0 -0.0345 0.065">
                       <geom quat="0.500001 0.5 -0.5 0.499999" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" density="0" mesh="rtcorp_logo_rabbit"/>
-                      <geom quat="0.500001 0.5 -0.5 0.499999" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" mesh="rtcorp_logo_rabbit"/>
+                      <geom quat="0.500001 0.5 -0.5 0.499999" type="mesh" group="3" rgba="1 0.3 0.3 1" mesh="rtcorp_logo_rabbit"/>
                     </body>
                     <body name="crane_x7_wrist_link" pos="0 0 0.129">
                       <inertial pos="0.0061 0.000826 -0.00355" quat="0.515253 0.472221 0.45875 0.548698" mass="0.14" diaginertia="7.35371e-05 6.16647e-05 3.96983e-05"/>
                       <joint name="crane_x7_lower_arm_revolute_part_joint" range="-1.5708 1.5708" actuatorfrcrange="-4 4" armature="0.01" damping="1" frictionloss="0.2" axis="0 -1 0"/>
                       <geom quat="0.707107 0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="0.95 0.95 0.95 1" density="0" mesh="wrist"/>
-                      <geom quat="0.707107 0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="0.95 0.95 0.95 1" mesh="wrist"/>
+                      <geom quat="0.707107 0.707106 0 0" type="mesh" group="3" rgba="0.95 0.95 0.95 1" mesh="collision_wrist"/>
                       <body name="crane_x7_gripper_base_link" pos="0 0 0.019">
                         <inertial pos="0.000108 -0.00103 0.0208" quat="0.0785654 0.710177 0.0883506 0.694025" mass="0.121" diaginertia="4.29993e-05 4.13081e-05 3.19926e-05"/>
                         <joint name="crane_x7_wrist_joint" range="-2.9147 2.9147" actuatorfrcrange="-4 4" armature="0.01" damping="1" frictionloss="0.2"/>
                         <geom quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" density="0" mesh="wide_two_finger_gripper_actuator"/>
-                        <geom quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" mesh="wide_two_finger_gripper_actuator"/>
+                        <geom quat="1 0 0 0" type="mesh" group="3" rgba="1 0.3 0.3 1" mesh="collision_wide_two_finger_gripper_actuator"/>
+                        <site name="ee_site" pos="0 0 0.07" group="4" rgba="0 1 0 1"/>
                         <body name="crane_x7_gripper_finger_a_link" pos="-0.012 0 0.024">
                           <inertial pos="-0.00265 0.00354 0.0269" quat="0.984928 -0.171008 0.0177127 0.0189402" mass="0.0158" diaginertia="1.01113e-05 6.42734e-06 4.75141e-06"/>
                           <joint name="crane_x7_gripper_finger_a_joint" range="-0.0872665 1.5708" actuatorfrcrange="-4 4" armature="0.01" damping="0.2" frictionloss="0.8" axis="0 -1 0"/>
                           <geom quat="0.707107 0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" density="0" mesh="wide_two_finger_gripper_finger_a"/>
-                          <geom quat="0.707107 0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" mesh="wide_two_finger_gripper_finger_a"/>
+                          <geom quat="0.707107 0.707106 0 0" type="mesh" group="3" rgba="1 0.3 0.3 1" mesh="collision_wide_two_finger_gripper_finger_a"/>
                         </body>
                         <body name="crane_x7_gripper_finger_b_link" pos="0.012 0 0.024">
                           <inertial pos="0.00301 0.00285 0.0309" quat="0.970705 -0.233877 -0.0485674 -0.0259722" mass="0.0139" diaginertia="7.52043e-06 4.48055e-06 3.93902e-06"/>
                           <joint name="crane_x7_gripper_finger_b_joint" range="-0.0872665 1.5708" actuatorfrcrange="-4 4" armature="0.01" damping="0.2" frictionloss="0.8" axis="0 1 0"/>
                           <geom quat="0.707107 0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" density="0" mesh="wide_two_finger_gripper_finger_b"/>
-                          <geom quat="0.707107 0.707106 0 0" type="mesh" contype="0" conaffinity="0" group="2" rgba="1 0.3 0.3 1" mesh="wide_two_finger_gripper_finger_b"/>
+                          <geom quat="0.707107 0.707106 0 0" type="mesh" group="3" rgba="1 0.3 0.3 1" mesh="collision_wide_two_finger_gripper_finger_b"/>
                         </body>
                       </body>
                     </body>
@@ -119,6 +130,12 @@
     </body>
     <body name="dummy_mimic_fix"/>
   </worldbody>
+
+  <contact>
+    <exclude body1="crane_x7_upper_arm_revolute_part_link" body2="crane_x7_lower_arm_revolute_part_link"/>
+    <exclude body1="crane_x7_lower_arm_revolute_part_link" body2="crane_x7_gripper_base_link"/>
+    <exclude body1="crane_x7_gripper_finger_a_link" body2="crane_x7_gripper_finger_b_link"/>
+  </contact>
 
   <equality>
     <joint joint1="crane_x7_gripper_finger_b_joint" joint2="crane_x7_gripper_finger_a_joint"/>
