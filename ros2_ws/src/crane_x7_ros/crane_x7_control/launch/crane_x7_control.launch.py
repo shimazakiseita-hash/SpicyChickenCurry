@@ -136,18 +136,20 @@ def generate_launch_description():
         arguments=['joint_state_controller'],
     )
 
+    # Lyrical では ros2_control_node に渡したパラメータがコントローラまで届かないため、
+    # spawner で直接パラメータファイルを読み込ませる
     spawn_arm_controller = Node(
         package='controller_manager',
         executable='spawner',
         output='screen',
-        arguments=['crane_x7_arm_controller'],
+        arguments=['crane_x7_arm_controller', '--param-file', crane_x7_controllers],
     )
 
     spawn_gripper_controller = Node(
         package='controller_manager',
         executable='spawner',
         output='screen',
-        arguments=['crane_x7_gripper_controller'],
+        arguments=['crane_x7_gripper_controller', '--param-file', crane_x7_controllers],
     )
 
     return LaunchDescription([

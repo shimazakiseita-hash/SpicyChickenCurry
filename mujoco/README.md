@@ -57,6 +57,31 @@ ros2 launch crane_x7_rl reach_demo.launch.py policy_path:=$PWD/mujoco/policies/r
 直立姿勢に戻る → 目標（黄色い球）が現れる → 5 秒かけて手先を目標へ、を繰り返します。ログに毎回の到達誤差が出ます。
 ノード（`ros2_ws/src/crane_x7_rl`）は numpy だけで推論するので、`.venv` なしで動きます。
 
+### 実機で動かす
+
+**実機ではまだ試していません。** 実機用の launch を仮想モーター（`use_mock_components:=true`）で動かし、ノードとの接続までは確認済みです。
+
+初めて動かす前の準備（1 回だけ）:
+
+```bash
+sudo usermod -aG dialout $USER   # USB シリアルを使う権限。反映には再ログインが必要
+```
+
+動かす手順:
+
+```bash
+# ターミナル1: 実機の制御 + MoveIt（まず実機をつながずに use_mock_components:=true で試すと安全）
+ros2 launch crane_x7_examples demo.launch.py port_name:=/dev/ttyUSB0
+# ターミナル2: 方策を動かす（実機には /clock が無いので use_sim_time:=false が必須）
+ros2 launch crane_x7_rl reach_demo.launch.py policy_path:=$PWD/mujoco/policies/reach_v1.npz use_sim_time:=false
+```
+
+安全のために:
+- 最初は MoveIt のサンプル（`example:=pose_groupstate`）で、実機が普通に動くことを確かめてから方策を動かす
+- 周りに物や人がいない状態で、すぐに電源を切れるようにしておく
+- 方策は「全関節 0（直立）→ 前方の目標へ」を繰り返す。目標は base_link から x 0.15〜0.40 m、y ±0.25 m、z 0.05〜0.45 m の範囲に出る
+- 関節の速度は最大 1 rad/s。学習はシミュレーションだけなので、実機特有の遅れや振動が出たらすぐ止める
+
 観測・行動の定義を変えるときは、`envs/crane_x7_reach.py` と `crane_x7_rl/policy.py` の `build_observation` を両方直してください。
 関節名・制御周期・手先オフセットなどの設定値は `policy.npz` に一緒に保存され、ノードはそれを読みます。
 

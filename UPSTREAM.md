@@ -19,7 +19,7 @@
 - VTK 9.5 で `JsonCpp::JsonCpp` が見つからない問題への対応（`find_package(jsoncpp)` を追加）
 - message_filters のヘッダ名変更（`.h` → `.hpp`）と QoS 引数の必須化
 - OpenCV 4.7 以降の aruco API 変更（`getPredefinedDictionary` の戻り値）
-- Gazebo 用 launch で、spawner に `--param-file` でコントローラ設定を渡す
+- Gazebo 用・実機用の launch で、spawner に `--param-file` でコントローラ設定を渡す（Lyrical ではこれが無いとアームとグリッパーのコントローラが起動しない）
 
 ## upstream を更新したいとき
 

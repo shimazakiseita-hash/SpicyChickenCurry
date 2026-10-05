@@ -34,6 +34,33 @@ index 5882c38..d4f17b2 100644
  
    CRANE_X7_CONTROL_PUBLIC
    std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
+diff --git a/crane_x7_control/launch/crane_x7_control.launch.py b/crane_x7_control/launch/crane_x7_control.launch.py
+index 0aeebac..ebbeff7 100644
+--- a/crane_x7_control/launch/crane_x7_control.launch.py
++++ b/crane_x7_control/launch/crane_x7_control.launch.py
+@@ -136,18 +136,20 @@ def generate_launch_description():
+         arguments=['joint_state_controller'],
+     )
+ 
++    # Lyrical では ros2_control_node に渡したパラメータがコントローラまで届かないため、
++    # spawner で直接パラメータファイルを読み込ませる
+     spawn_arm_controller = Node(
+         package='controller_manager',
+         executable='spawner',
+         output='screen',
+-        arguments=['crane_x7_arm_controller'],
++        arguments=['crane_x7_arm_controller', '--param-file', crane_x7_controllers],
+     )
+ 
+     spawn_gripper_controller = Node(
+         package='controller_manager',
+         executable='spawner',
+         output='screen',
+-        arguments=['crane_x7_gripper_controller'],
++        arguments=['crane_x7_gripper_controller', '--param-file', crane_x7_controllers],
+     )
+ 
+     return LaunchDescription([
 diff --git a/crane_x7_control/src/crane_x7_hardware.cpp b/crane_x7_control/src/crane_x7_hardware.cpp
 index 8be9694..964964e 100644
 --- a/crane_x7_control/src/crane_x7_hardware.cpp
