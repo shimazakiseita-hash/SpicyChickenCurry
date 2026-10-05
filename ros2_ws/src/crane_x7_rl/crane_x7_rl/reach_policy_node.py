@@ -156,7 +156,7 @@ class ReachPolicyNode(Node):
         try:
             ee = self.ee_position()
         except TransformException as e:
-            self.get_logger().warn(f'手先位置を取得できません: {e}', throttle_duration_sec=2.0)
+            self.get_logger().warning(f'手先位置を取得できません: {e}', throttle_duration_sec=2.0)
             return
 
         obs = self.policy.build_observation(self.joint_pos, self.joint_vel, ee, self.goal)

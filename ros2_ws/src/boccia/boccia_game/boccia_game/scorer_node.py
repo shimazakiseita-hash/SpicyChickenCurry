@@ -35,7 +35,7 @@ class ScorerNode(Node):
         self.score_pub.publish(score)
 
         if jack is None:
-            self.get_logger().warn('ジャックボールが見つかりません', throttle_duration_sec=5.0)
+            self.get_logger().warning('ジャックボールが見つかりません', throttle_duration_sec=5.0)
 
 
 def main():

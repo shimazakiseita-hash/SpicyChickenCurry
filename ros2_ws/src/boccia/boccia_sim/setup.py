@@ -27,6 +27,7 @@ setup(
             'fake_ball_publisher = boccia_sim.fake_ball_publisher:main',
             'synthetic_camera_node = boccia_sim.synthetic_camera_node:main',
             'gazebo_ball_spawner = boccia_sim.gazebo_ball_spawner:main',
+            'gazebo_ball_publisher = boccia_sim.gazebo_ball_publisher:main',
         ],
     },
 )
