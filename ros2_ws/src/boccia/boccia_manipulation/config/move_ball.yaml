@@ -12,8 +12,8 @@ move_ball_server:
     # 計画に使う座標系
     planning_frame: base_link
 
-    # ボールの真上から近づく高さ
-    approach_height: 0.10
+    # ボールの真上から近づく高さ (開いた指先が keepout_height より上になるようにする)
+    approach_height: 0.13
     # つかむときの、gripper_base_link とボール中心の高さの差 (指の長さ分)
     grasp_height: 0.07
     # 持ち上げる高さ
@@ -21,12 +21,37 @@ move_ball_server:
 
     # グリッパーの指の角度 [rad] (crane_x7_gripper_finger_a_joint)
     gripper_open: 0.9      # 指先の間が約 100 mm
-    gripper_close: 0.15    # ボールの直径に合わせて調整
+    # 閉じる目標はボールに当たる角度 (直径 43 mm で約 0.31 rad、Gazebo で実測) より深くして握る.
+    # 深すぎると、指がボールで止まったときにコントローラの goal_tolerance (0.1 rad) を超えて
+    # 「失敗」と判定される
+    gripper_close: 0.22
+    # 置くとき、手を下ろす高さの調整 [m]。マイナスにすると、ボールを台に少し押し付けてから指を開く.
+    # (2 本の指が同時に離れないと、残った指がボールを横に押してしまうので、台との摩擦で押さえる)
+    release_clearance: -0.002
 
-    # 押し出しモード: 目標の手前に置く距離と、押し出す距離 [m]
-    push_standoff: 0.06
+    # 押し出しモード [m]
+    #   push_distance:       ボールを目標のどれだけ手前に置いてから押すか (= ボールを押して動かす距離)
+    #   push_standoff:       押し始めるとき、指をボールからどれだけ離して下ろすか
+    #   push_height:         押すときの gripper_base_link とボール中心の高さの差 (指先がボールの中心付近に当たる高さ)
+    #   push_contact_offset: 押している間の、gripper_base_link からボール中心までの水平距離 (Gazebo で実測)
     push_distance: 0.05
+    push_standoff: 0.02
+    push_height: 0.075
+    push_contact_offset: 0.048
+
+    # 台の上面の高さ [m] (MoveIt に障害物として教える。court.yaml の surface_z と同じ値にする)
+    table_surface_z: 0.0
+    # 動作のあと home 姿勢に戻る (固定カメラの視界をあける)
+    return_home: true
+    # 自由な移動 (OMPL) のとき、コートの上のこの高さ [m] までは立ち入り禁止にする
+    # (MoveIt はボールの位置を知らないので、低く通ってボールを弾かないように)
+    # コートの範囲は court.yaml から読む (launch から court_config を渡す)
+    keepout_height: 0.06
 
     # 速度・加速度の倍率 (0.0〜1.0)。実機では小さめから始める
     velocity_scaling: 0.3
     acceleration_scaling: 0.3
+    # グリッパーだけはゆっくり動かす (速く開くと指がボールを弾いて転がしてしまう)
+    gripper_velocity_scaling: 0.1
+    # 押し出すときの速さ (速いほどボールが遠くまで転がる。段階 2 の「力加減」につながる)
+    push_velocity_scaling: 0.1

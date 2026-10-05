@@ -21,6 +21,8 @@ def generate_launch_description():
     share = get_package_share_directory('boccia_manipulation')
     moveit_config = (
         MoveItConfigsBuilder('crane_x7')
+        # OMPL (自由な移動) と Pilz (直線移動) の両方を読み込む
+        .planning_pipelines(pipelines=['ompl', 'pilz_industrial_motion_planner'])
         .moveit_cpp(file_path=os.path.join(share, 'config', 'moveit_py.yaml'))
         .to_moveit_configs()
     )
@@ -36,6 +38,8 @@ def generate_launch_description():
             package='boccia_manipulation',
             executable='move_ball_server',
             output='screen',
-            parameters=[params, os.path.join(share, 'config', 'move_ball.yaml')],
+            parameters=[params, os.path.join(share, 'config', 'move_ball.yaml'),
+                        {'court_config': os.path.join(
+                            get_package_share_directory('boccia_bringup'), 'config', 'court.yaml')}],
         ),
     ])

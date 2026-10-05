@@ -98,7 +98,7 @@ ros2 launch crane_x7_examples demo.launch.py port_name:=/dev/ttyUSB0     # 実�
 |---|---|---|---|
 | **L0** | `ros2 launch boccia_bringup dummy_l0.launch.py` | 検出結果そのもの（シナリオのボール位置をそのまま出す） | 試合進行とアーム動作 |
 | **L1** | `ros2 launch boccia_bringup dummy_l1.launch.py` | カメラ画像（シナリオの位置にボールがある画像と深度を合成） | 検出・座標変換も含めた全体。正解が分かるので検出の誤差も測れる |
-| L2 | （未作成）Gazebo | 物理シミュレーション（コート・ボール・カメラ） | つかむ・転がるところまで含めた全体 |
+| L2 | `ros2 launch boccia_bringup gazebo.launch.py`（カメラは未作成） | 物理シミュレーション（コート・ボール・カメラ） | つかむ・転がるところまで含めた全体 |
 | 実機 | `ros2 launch boccia_bringup real.launch.py` | なし | 本番 |
 
 検出だけを試したいときは `with_arm:=false` を付けるとアーム動作のノードを起動しません。
@@ -109,6 +109,45 @@ ros2 launch crane_x7_examples demo.launch.py port_name:=/dev/ttyUSB0     # 実�
 ros2 service call /boccia/play_once std_srvs/srv/Trigger
 ros2 topic echo /boccia/score
 ```
+
+### Gazebo でアーム動作（つかむ・運ぶ・置く・押す）を試す
+
+`crane_x7_gazebo` の台のワールドにシナリオのボールを置き、MoveBall アクションサーバまで起動します（L2 の一部）。
+
+```bash
+# ターミナル1: Gazebo + MoveIt + ボール + アクションサーバ (15 秒ほど待ってからボールが出る)
+ros2 launch boccia_bringup gazebo.launch.py
+
+# ターミナル2: 赤ボール (0.22, 0.00) を (0.35, -0.05) に置く
+ros2 action send_goal /boccia/move_ball boccia_interfaces/action/MoveBall \
+  "{ball: {type: 2, position: {x: 0.22, y: 0.0, z: 0.0215}}, target: {x: 0.35, y: -0.05}, target_frame: base_link, mode: 0}" --feedback
+# mode: 1 にすると、目標の 5 cm 手前に置いてから押し出す
+
+# ボールの位置を確かめる / ボールを最初の配置に戻す
+gz model -m boccia_ball_3_red -p
+ros2 run boccia_sim gazebo_ball_spawner --ros-args \
+  -p scenario:=$(ros2 pkg prefix boccia_sim)/share/boccia_sim/config/scenario_default.yaml \
+  -p court_config:=$(ros2 pkg prefix boccia_bringup)/share/boccia_bringup/config/court.yaml
+```
+
+アーム動作の作り（`boccia_manipulation/move_ball_server.py`）:
+
+- **長い移動**（ボールの上へ、運ぶ、home へ）は OMPL で計画する。MoveIt はボールの位置を知らないので、このときだけコートの上の高さ 6 cm までを「立ち入り禁止の箱」にして、ボールの上を高く通らせる。
+- **短い移動**（上下、押し出し）は、今の関節角から少しずつ逆運動学を解き（減衰最小二乗法）、Pilz PTP で各関節をまっすぐ動かす。手先が真下を向く姿勢は特異姿勢に近く、普通の逆運動学や Pilz LIN では関節角が大きく飛んで失敗するため。
+- 置くときはボールを台に 2 mm 押し付けてから、グリッパーをゆっくり開く（2 本の指が同時に離れず、ボールを横に弾いてしまうため）。
+
+Gazebo での結果（2026-10-05 時点）:
+
+| モード | 目標との誤差 | 備考 |
+|---|---|---|
+| 置く（place） | 1.2〜1.6 cm | つかんだときの位置が毎回 ±1.5 cm ほどずれる（指の面に沿ってボールが動く） |
+| 押す（push） | 1.7 cm | 押す速さは `push_velocity_scaling`（段階 2 の「力加減」につながる） |
+
+Gazebo で分かっている制限:
+
+- **ボールに転がり抵抗が無い。** そのままだと少し触れただけで止まらずに転がり続けるので、`gazebo_ball_spawner` が Hydrodynamics プラグインで速度に比例する抵抗をかけている（本物の転がり抵抗とは違う近似。段階 2 で転がる距離を扱うときは実物で測って合わせる）。
+- **finger_b はソフトウェアで finger_a に合わせて動かしている**（物理エンジンが mimic に対応していない）ため、開閉のタイミングが少しずれる。
+- **Gazebo をもう一度起動する前に、前の Gazebo が残っていないか確認する。** `gz-sim-main` が残っていると、コントローラの起動に失敗する（`Controller already loaded`）。`pkill -f gz-sim` で止める。
 
 RealSense の実機が届いたら、rosbag2 で録画しておくと、ロボットなしで何度でも検出を試せます。
 
@@ -124,10 +163,10 @@ ros2 bag record /camera/color/image_raw /camera/aligned_depth_to_color/image_raw
 - [x] `boccia_sim/fake_ball_publisher.py`: シナリオから `Ball` を作って出す（L0。テスト: `colcon test --packages-select boccia_sim`）
 - [x] `boccia_game/scorer_node.py`: ジャックとの距離を計算する（計算は `scoring.py`。テスト: `colcon test --packages-select boccia_game`）
 - [ ] `boccia_game/game_manager_node.py`: 自分のボールを選んで MoveBall を依頼する
-- [ ] `boccia_manipulation/move_ball_server.py`: MoveIt で「つかむ → 運ぶ → 置く/押す」
+- [x] `boccia_manipulation/move_ball_server.py`: MoveIt で「つかむ → 運ぶ → 置く/押す」（Gazebo で確認済み。実機は未確認）
 - [ ] `boccia_sim/synthetic_camera_node.py`: 合成画像を作る（L1）
 - [ ] `boccia_perception/detection.py`, `ball_detector_node.py`: 色と深度でボールを検出する
-- [ ] `boccia_sim/worlds/`: Gazebo のワールド（L2）
+- [ ] `boccia_sim/worlds/`: Gazebo のワールド（L2。ボールの配置とアーム動作は `gazebo.launch.py` でできている。残りはコートと固定カメラ）
 - [ ] カメラのキャリブレーション（下記）
 
 ## カメラの位置合わせ（キャリブレーション）
