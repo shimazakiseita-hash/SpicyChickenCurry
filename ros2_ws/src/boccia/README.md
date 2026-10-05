@@ -121,7 +121,7 @@ ros2 bag record /camera/color/image_raw /camera/aligned_depth_to_color/image_raw
 ひな形の段階では、ノードは起動して決められたトピックやアクションをやり取りしますが、中身の処理はまだありません。
 各ファイルの `TODO(段階1)` に、やることと手順を書いてあります。
 
-- [ ] `boccia_sim/fake_ball_publisher.py`: シナリオから `Ball` を作って出す（**最初にやる**。L0 が動くようになる）
+- [x] `boccia_sim/fake_ball_publisher.py`: シナリオから `Ball` を作って出す（L0。テスト: `colcon test --packages-select boccia_sim`）
 - [ ] `boccia_game/scorer_node.py`: ジャックとの距離を計算する
 - [ ] `boccia_game/game_manager_node.py`: 自分のボールを選んで MoveBall を依頼する
 - [ ] `boccia_manipulation/move_ball_server.py`: MoveIt で「つかむ → 運ぶ → 置く/押す」

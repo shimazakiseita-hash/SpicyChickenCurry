@@ -24,6 +24,7 @@ def generate_launch_description():
         DeclareLaunchArgument('use_sim_time', default_value='false'),
         Node(package='boccia_sim', executable='fake_ball_publisher', output='screen',
              parameters=[{'scenario': LaunchConfiguration('scenario'),
+                          'court_config': os.path.join(bringup, 'config', 'court.yaml'),
                           'use_sim_time': LaunchConfiguration('use_sim_time')}]),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(bringup, 'launch', 'core.launch.py')),
