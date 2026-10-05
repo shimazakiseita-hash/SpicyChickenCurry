@@ -13,9 +13,12 @@ Ball ball
 geometry_msgs/Point target
 string target_frame
 uint8 mode
+# 他のボール (動かすボール以外). アームはこれらを障害物として避け、
+# 指が他のボールに当たらない手首の向きを選ぶ. 位置は ball と同じ座標系 (base_link)
+Ball[] obstacles
 ---
 bool success
 string message
 ---
-# 今どの段階か (approach / grasp / lift / transport / release / push / retreat)
+# 今どの段階か (check / approach / grasp / lift / transport / release / retreat / push / home)
 string stage

@@ -44,8 +44,13 @@ class GameManagerNode(Node):
         self.declare_parameter('done_radius', 0.03)
         # 前に拾った位置からこれ以内のボールは「同じボール」とみなして選ばない [m]
         self.declare_parameter('same_ball_radius', 0.02)
-        # 置く場所・押し出す道筋と他のボールの中心がこれより近いと、手で弾いてしまうので断る [m]
-        self.declare_parameter('clearance', 0.07)
+        # 置く場所と他のボールの中心がこれより近いと断る [m]
+        # 直径 43 mm + 手の中でのボールの位置のずれ (Gazebo で ±1.5 cm ほど) の余裕.
+        # 5 cm だと運んでいるボールがジャックに当たったことがある. 手 (指) が当たるかどうかは
+        # move_ball_server が MoveIt で確かめる
+        self.declare_parameter('place_clearance', 0.06)
+        # 押し出しの道筋と他のボールの中心がこれより近いと、押している手で弾いてしまうので断る [m]
+        self.declare_parameter('push_clearance', 0.07)
         # 押し出しのときに手が動く範囲 (move_ball.yaml の push_distance + push_standoff + push_contact_offset)
         self.declare_parameter('push_reach_behind', 0.12)
 
@@ -98,12 +103,13 @@ class GameManagerNode(Node):
             response.message = '動かせる自分のボールがありません (/boccia/reset で記録を消せます)'
             return response
 
+        clearance = self.get_parameter(f'{mode}_clearance').value
         obstacle = find_obstacle(list(self.latest_balls.balls), ball,
-                                 self.hand_path(target, mode), self.get_parameter('clearance').value)
+                                 self.hand_path(target, mode), clearance)
         if obstacle is not None:
             response.message = (f'目標の近くに他のボール (id {obstacle.id}, '
                                 f'{obstacle.position.x:.3f}, {obstacle.position.y:.3f}) があり、'
-                                '手で弾いてしまうので中止しました。目標を変えてください')
+                                f'{clearance * 100:.0f} cm 以内なので中止しました。目標を変えてください')
             return response
 
         goal = MoveBall.Goal()
@@ -111,6 +117,8 @@ class GameManagerNode(Node):
         goal.target.x, goal.target.y = target
         goal.target_frame = self.latest_balls.header.frame_id
         goal.mode = MODES[mode]
+        # 他のボールも渡す (アームが障害物として避け、指が当たらない手首の向きを選ぶ)
+        goal.obstacles = [b for b in self.latest_balls.balls if b is not ball]
         self.busy = True
         self.picked_from.append((ball.position.x, ball.position.y))
         future = self.move_client.send_goal_async(goal)
