@@ -3,13 +3,15 @@
 入力: /boccia/balls (BallArray)
 出力: /boccia/score (Score)
 
-距離はコート面上の水平距離 (x, y のみ) で測る.
+距離はコート面上の水平距離 (x, y のみ) で測る. 計算の中身は scoring.py.
 段階 2 以降では、この値を「投球の結果」として記録したり、強化学習の報酬に使ったりする.
 """
 
 import rclpy
-from boccia_interfaces.msg import Ball, BallArray, Score
+from boccia_interfaces.msg import BallArray, Score
 from rclpy.node import Node
+
+from boccia_game.scoring import compute_score
 
 
 class ScorerNode(Node):
@@ -20,16 +22,20 @@ class ScorerNode(Node):
         self.create_subscription(BallArray, '/boccia/balls', self.on_balls, 10)
 
     def on_balls(self, msg: BallArray):
+        jack, others, distances, closest_type = compute_score(list(msg.balls))
+
         score = Score()
         score.header = msg.header
-        score.closest_type = Ball.TYPE_UNKNOWN
-        # TODO(段階1):
-        #   1. type == TYPE_JACK のボールを探す (複数あれば confidence が一番高いもの)
-        #   2. 見つかれば jack_found = True、jack_position に入れる
-        #   3. ジャック以外の各ボールについて水平距離 hypot(dx, dy) を distances に入れる
-        #   4. 一番近いボールの type を closest_type に入れる
-        score.jack_found = False
+        score.jack_found = jack is not None
+        if jack is not None:
+            score.jack_position = jack.position
+        score.balls = others
+        score.distances = distances
+        score.closest_type = closest_type
         self.score_pub.publish(score)
+
+        if jack is None:
+            self.get_logger().warn('ジャックボールが見つかりません', throttle_duration_sec=5.0)
 
 
 def main():

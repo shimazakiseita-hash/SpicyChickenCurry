@@ -122,7 +122,7 @@ ros2 bag record /camera/color/image_raw /camera/aligned_depth_to_color/image_raw
 各ファイルの `TODO(段階1)` に、やることと手順を書いてあります。
 
 - [x] `boccia_sim/fake_ball_publisher.py`: シナリオから `Ball` を作って出す（L0。テスト: `colcon test --packages-select boccia_sim`）
-- [ ] `boccia_game/scorer_node.py`: ジャックとの距離を計算する
+- [x] `boccia_game/scorer_node.py`: ジャックとの距離を計算する（計算は `scoring.py`。テスト: `colcon test --packages-select boccia_game`）
 - [ ] `boccia_game/game_manager_node.py`: 自分のボールを選んで MoveBall を依頼する
 - [ ] `boccia_manipulation/move_ball_server.py`: MoveIt で「つかむ → 運ぶ → 置く/押す」
 - [ ] `boccia_sim/synthetic_camera_node.py`: 合成画像を作る（L1）
