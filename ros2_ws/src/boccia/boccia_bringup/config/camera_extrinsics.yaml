@@ -1,0 +1,14 @@
+# 固定カメラ (RealSense D435) の取り付け位置
+#
+# base_link から camera_link (RealSense の本体の座標系) への変換。
+# camera.launch.py が static_transform_publisher でこの値を TF に流す。
+# camera_link より先 (camera_color_optical_frame など) は realsense2_camera が流す。
+#
+# ※ 仮の値: コートの上方 0.8 m から真下を見下ろす配置。
+#   実物を取り付けたら、AR マーカーを使ったキャリブレーションで求めた値に書き換える (README 参照)。
+#   camera_link は x 軸がレンズの向きなので、真下を向けるには pitch = +90° (1.5708 rad)。
+
+parent_frame: base_link
+child_frame: camera_link
+translation: {x: 0.35, y: 0.0, z: 0.80}
+rotation_rpy: {roll: 0.0, pitch: 1.5708, yaw: 0.0}   # [rad]

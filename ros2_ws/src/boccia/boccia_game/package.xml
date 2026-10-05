@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>boccia_game</name>
+  <version>0.1.0</version>
+  <description>試合の進行 (どのボールをどこへ動かすか) と得点計算 (ジャックとの距離)</description>
+  <maintainer email="shimazakiseita@gmail.com">SpicyChickenCurry</maintainer>
+  <license>Apache-2.0</license>
+
+  <exec_depend>boccia_interfaces</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

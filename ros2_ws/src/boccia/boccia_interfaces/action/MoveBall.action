@@ -1,0 +1,21 @@
+# ボールを 1 個つかんで目標位置へ運ぶ (段階 1)
+#
+# MODE_PLACE: 目標位置に置く
+# MODE_PUSH:  目標位置の手前に置き、目標の方向へ押し出す
+# 段階 2 の「投球」は、力加減・角度を持つ別のアクション (ThrowBall など) を追加する想定。
+
+uint8 MODE_PLACE = 0
+uint8 MODE_PUSH = 1
+
+# 動かすボール (検出結果の Ball をそのまま入れる)
+Ball ball
+# 目標位置 [m] (target_frame の座標系、z は無視してコート面に置く)
+geometry_msgs/Point target
+string target_frame
+uint8 mode
+---
+bool success
+string message
+---
+# 今どの段階か (approach / grasp / lift / transport / release / push / retreat)
+string stage

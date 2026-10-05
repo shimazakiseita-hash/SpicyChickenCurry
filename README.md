@@ -65,6 +65,17 @@ MuJoCo で学習した到達タスクの方策を Gazebo で動かすデモ（Ga
 ros2 launch crane_x7_rl reach_demo.launch.py policy_path:=$PWD/mujoco/policies/reach_v1.npz
 ```
 
+## ミニボッチャ（開発中）
+
+CRANE-X7 にミニボッチャをプレイさせるプロジェクトです。段階 1 では「固定カメラでボールを見つけ、アームでつかんで目標位置に置く・押し出す」までを作ります。
+パッケージ構成、ノードの役割、実機が無くても試せるダミーデータの使い方は [ros2_ws/src/boccia/README.md](ros2_ws/src/boccia/README.md) を参照してください。
+
+```bash
+# ダミーデータ (L0) で動かす: ロボット側を仮想モーターで起動してから
+ros2 launch crane_x7_examples demo.launch.py use_mock_components:=true
+ros2 launch boccia_bringup dummy_l0.launch.py
+```
+
 ## トラブルシューティング
 
 ### VS Code のターミナルから起動すると RViz / Gazebo が落ちる
@@ -89,7 +100,31 @@ ros2_ws/src/
 ├── crane_x7_description/      # rt-net: URDF・メッシュ
 ├── crane_x7_ros/              # rt-net: 制御・MoveIt・Gazebo・サンプル（Lyrical 向けに修正済み）
 ├── rt_manipulators_cpp_ros2/  # rt-net: 実機制御ライブラリ
-└── crane_x7_rl/               # チーム: MuJoCo で学習した方策を動かすノード
+├── crane_x7_rl/               # チーム: MuJoCo で学習した方策を動かすノード
+└── boccia/                    # チーム: ミニボッチャ (6 パッケージ)
 ```
 
-チームで作るパッケージは `ros2_ws/src/` の下に追加してください。
+チームで作るパッケージは `ros2_ws/src/` の下に追加してください。rt-net のパッケージ（`crane_x7_*`、`rt_manipulators_cpp_ros2`）は、Lyrical 対応以外では書き換えないでください（理由は [UPSTREAM.md](UPSTREAM.md)）。
+
+## ライセンス
+
+このリポジトリには、ライセンスの異なるものが混ざっています。
+
+| 対象 | ライセンス |
+|---|---|
+| `ros2_ws/src/crane_x7_description/`（CRANE-X7 の URDF・メッシュ） | 株式会社アールティ **非商用使用許諾規約**（[LICENSE](ros2_ws/src/crane_x7_description/LICENSE)） |
+| `mujoco/models/crane_x7/`（上の URDF・メッシュから作った MuJoCo モデル） | 同上（元の規約に従う） |
+| `ros2_ws/src/crane_x7_ros/`、`ros2_ws/src/rt_manipulators_cpp_ros2/` | Apache License 2.0（株式会社アールティ） |
+| チームで作ったもの（`boccia/`、`crane_x7_rl/`、`mujoco/` のコードなど） | Apache License 2.0（各 `package.xml` に記載） |
+
+### 非商用使用許諾規約に沿っているか
+
+`crane_x7_description` の規約では、次の点が関係します。
+
+- **使ってよい目的**（第 2 条）: 「教育機関において非商業的な学習、教育または研究を目的とする学生および教職員による使用」は非商用使用に当たります。大学の授業（設計製作論実習３）での使用はこれに該当します。
+- **第三者にアクセスさせること**（第 5 条（ウ））: アールティの事前の承諾なく第三者にアクセスさせることは禁止されていますが、「非商業目的の研究または教育の一環」であれば例外とされています。このリポジトリを**授業の関係者（チームメンバー、教員、来年度以降の受講生）に Private で共有する**のは、この例外の範囲と考えています。
+- **してはいけないこと**: 商用目的での使用（販売・貸与なども含む）、`LICENSE` や著作権表示を消すこと、規約を他人に譲渡・サブライセンスすること。
+- 使用許諾はアールティがいつでも取り消せる（第 4 条）ことにも注意してください。
+
+**リポジトリを Public にしたり、授業以外（コンテストや企業との共同作業など）で使ったりする場合**は、`crane_x7_description` を含めたまま公開してよいかを、事前に担当教員またはアールティに確認してください。
+（この節はチームが規約を読んで判断したもので、法的な助言ではありません。）

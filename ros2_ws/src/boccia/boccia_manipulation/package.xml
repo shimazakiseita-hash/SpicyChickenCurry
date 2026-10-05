@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>boccia_manipulation</name>
+  <version>0.1.0</version>
+  <description>MoveIt で CRANE-X7 を動かし、ボールをつかんで置く・押し出す (MoveBall アクションサーバ)</description>
+  <maintainer email="shimazakiseita@gmail.com">SpicyChickenCurry</maintainer>
+  <license>Apache-2.0</license>
+
+  <exec_depend>boccia_interfaces</exec_depend>
+  <exec_depend>crane_x7_moveit_config</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>moveit_py</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>tf2_geometry_msgs</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

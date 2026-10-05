@@ -1,0 +1,32 @@
+# ボールをつかんで置く・押し出す動作の設定
+#
+# 高さはすべて「ボールの中心」からの値 [m]。実機で少しずつ調整する。
+
+move_ball_server:
+  ros__parameters:
+    # MoveIt の planning group 名 (crane_x7_moveit_config の SRDF と同じ)
+    arm_group: arm
+    gripper_group: gripper
+    # 手先として扱うリンク
+    ee_link: crane_x7_gripper_base_link
+    # 計画に使う座標系
+    planning_frame: base_link
+
+    # ボールの真上から近づく高さ
+    approach_height: 0.10
+    # つかむときの、gripper_base_link とボール中心の高さの差 (指の長さ分)
+    grasp_height: 0.07
+    # 持ち上げる高さ
+    lift_height: 0.08
+
+    # グリッパーの指の角度 [rad] (crane_x7_gripper_finger_a_joint)
+    gripper_open: 0.9      # 指先の間が約 100 mm
+    gripper_close: 0.15    # ボールの直径に合わせて調整
+
+    # 押し出しモード: 目標の手前に置く距離と、押し出す距離 [m]
+    push_standoff: 0.06
+    push_distance: 0.05
+
+    # 速度・加速度の倍率 (0.0〜1.0)。実機では小さめから始める
+    velocity_scaling: 0.3
+    acceleration_scaling: 0.3

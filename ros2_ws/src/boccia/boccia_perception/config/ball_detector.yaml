@@ -1,0 +1,33 @@
+# ボール検出ノードの設定
+#
+# トピック名は realsense2_camera を camera_namespace:='' camera_name:=camera、
+# align_depth.enable:=true で起動したときのもの (boccia_bringup/launch/camera.launch.py)。
+# ダミーデータ (boccia_sim の synthetic_camera_node) も同じトピック名で出す。
+
+ball_detector:
+  ros__parameters:
+    color_topic: /camera/color/image_raw
+    depth_topic: /camera/aligned_depth_to_color/image_raw
+    camera_info_topic: /camera/color/camera_info
+
+    # 検出したボール位置をこの座標系に変換して出す
+    target_frame: base_link
+
+    # 色の範囲 (OpenCV の HSV: H 0〜179, S 0〜255, V 0〜255)。照明に合わせて調整する
+    # 赤は H が 0 付近と 179 付近にまたがるので 2 つの範囲を持つ
+    jack_hsv_low:  [0, 0, 180]
+    jack_hsv_high: [179, 50, 255]
+    red_hsv_low:   [0, 120, 70]
+    red_hsv_high:  [10, 255, 255]
+    red2_hsv_low:  [170, 120, 70]
+    red2_hsv_high: [179, 255, 255]
+    blue_hsv_low:  [100, 120, 50]
+    blue_hsv_high: [130, 255, 255]
+
+    # 小さすぎる・大きすぎる領域を除外 (画像上の半径 [px])
+    min_radius_px: 5.0
+    max_radius_px: 80.0
+
+    # 深度の有効範囲 [m] (これ以外は測定エラーとして捨てる)
+    min_depth: 0.2
+    max_depth: 2.0
