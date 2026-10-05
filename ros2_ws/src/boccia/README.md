@@ -136,7 +136,7 @@ ros2 launch boccia_bringup gazebo.launch.py
 
 # アームだけを直接動かすこともできる: 赤ボール (0.22, 0.00) を (0.35, -0.05) に置く
 ros2 action send_goal /boccia/move_ball boccia_interfaces/action/MoveBall \
-  "{ball: {type: 2, position: {x: 0.22, y: 0.0, z: 0.0215}}, target: {x: 0.35, y: -0.05}, target_frame: base_link, mode: 0}" --feedback
+  "{ball: {type: 2, position: {x: 0.22, y: 0.0, z: 0.030}}, target: {x: 0.35, y: -0.05}, target_frame: base_link, mode: 0}" --feedback
 # mode: 1 にすると、目標の 5 cm 手前に置いてから押し出す
 
 # ボールの位置を確かめる / ボールを最初の配置に戻す
@@ -214,9 +214,23 @@ ros2 bag record /camera/color/image_raw /camera/aligned_depth_to_color/image_raw
 
 ## ボールの大きさについて
 
-CRANE-X7 のグリッパーは、MuJoCo モデルでの見積もりで指先が約 100 mm まで開きます。
-確実につかむには直径 60〜70 mm 以下のボールがよく、`court.yaml` では仮にゴルフボール程度（43 mm）にしています。
-公式のボッチャボール（約 85 mm、275 g）はつかめるかどうか際どく、重さもアームの負担になります。
+実物のミニボッチャのボールは**直径 60 mm・重さ 90 g**（柔らかく、ほとんど跳ねない・転がらない）。`court.yaml` はこの値にしている。ジャックボールも同じ大きさとしている（違えば `jack_diameter` を書き換える）。
+
+60 mm のボールに合わせて変えた設定（Gazebo で確認）:
+
+| 設定 | 値 | 理由 |
+|---|---|---|
+| `grasp_height` | 0.07 → 0.08 | グリッパーの本体は `gripper_base_link` の 42 mm 下まである。0.07 だとボールの上が本体にめり込む |
+| `gripper_close` / `gripper_holding` | 0.22 / 0.31 → 0.43 / 0.52 | 指がボールに当たって止まる角度が 0.52 rad（43 mm のときは 0.31 rad）。閉じる目標はそれより 0.09 rad 深く（コントローラの許容誤差 0.1 rad 以内） |
+| `release_clearance` | -0.002 → -0.008 | 90 g を持つと手が指令より数 mm 高く止まり、ボールが台から浮いたまま離されて転がったため |
+| `push_height` | 0.075 → 0.08 | 指先がボールの中心付近に当たる高さ |
+| `keepout_height` | 0.06 → 0.07 | ボールの高さが 6 cm になったため |
+| `place_clearance` / `push_clearance`（game_manager） | 6 / 7 cm → 7.5 / 8 cm | ボールが 17 mm 大きくなったため |
+| `rolling_damping`（Gazebo） | 0.1 → 1.0 | 実物は柔らかくてほとんど転がらないため（実物で測って合わせるまでの仮の値） |
+
+60 mm のボールでの結果（Gazebo、2026-10-05）: 置く 0.8 cm、押す 1.0 cm。
+
+グリッパーは指先で約 100 mm まで開くので、60 mm のボールは余裕を持ってつかめる。ただしボールの上とグリッパーの本体の隙間は 8 mm しかないので、これより大きいボールにするときは `grasp_height` の見直しが必要。
 
 ## ライセンス
 

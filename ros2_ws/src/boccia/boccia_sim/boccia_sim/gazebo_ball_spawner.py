@@ -18,8 +18,9 @@ crane_x7_gazebo の crane_x7_with_table.launch.py を起動した状態で使う
   world:            Gazebo のワールド名 (table.sdf は default)
   base_z_in_gazebo: Gazebo のワールド座標で見た base_link の高さ (crane_x7_with_table の -z)
   remove_models:    取り除くモデル名のリスト
-  mass, friction:   ボールの質量 [kg] と摩擦係数 (ゴルフボール程度)
-  rolling_damping:  転がり抵抗の代わりの抵抗 [N/(m/s)] (上の注意を参照)
+  mass, friction:   ボールの質量 [kg] (0 なら court.yaml の値) と摩擦係数
+  rolling_damping:  転がり抵抗の代わりの抵抗 [N/(m/s)] (上の注意を参照).
+                    実物のミニボッチャのボールは柔らかくてほとんど転がらないので、強めにしている
 """
 
 import subprocess
@@ -51,7 +52,7 @@ class GazeboBallSpawner(Node):
         for name, default in [
             ('scenario', ''), ('court_config', ''), ('world', 'default'),
             ('base_z_in_gazebo', 1.015), ('remove_models', ['wood_cube_5cm']),
-            ('mass', 0.046), ('friction', 1.0), ('rolling_damping', 0.1),
+            ('mass', 0.0), ('friction', 1.0), ('rolling_damping', 1.0),
         ]:
             self.declare_parameter(name, default)
 
@@ -80,7 +81,8 @@ class GazeboBallSpawner(Node):
                 self.get_logger().info(f'{name} を取り除きました')
 
         base_z = self.get_parameter('base_z_in_gazebo').value
-        mass = self.get_parameter('mass').value
+        # 質量はパラメータで指定がなければ court.yaml の値を使う
+        mass = self.get_parameter('mass').value or court['ball']['mass']
         mu = self.get_parameter('friction').value
         damping = self.get_parameter('rolling_damping').value
         for i, ball in enumerate(scenario['balls'], start=1):

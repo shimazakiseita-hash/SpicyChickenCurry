@@ -18,9 +18,11 @@ court:
   surface_z: 0.0
 
 ball:
-  # 直径 [m]。CRANE-X7 のグリッパーは指先で約 100 mm まで開くので 60〜70 mm 以下を推奨
-  diameter: 0.043
-  jack_diameter: 0.043
+  # 実物のミニボッチャのボール (2026-10 に届いたもの): 直径 60 mm、重さ 90 g
+  # ジャックボールも同じ大きさとしている (違う場合は jack_diameter を書き換える)
+  diameter: 0.060
+  jack_diameter: 0.060
+  mass: 0.090
 
 # 自分のチームの色 (red / blue)。boccia_game が「自分のボール」を選ぶときに使う
 team_color: red

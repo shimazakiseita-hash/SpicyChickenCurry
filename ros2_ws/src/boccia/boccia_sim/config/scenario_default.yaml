@@ -1,13 +1,13 @@
 # ダミーデータ用のボール配置 (L0 / L1 共通)
 #
-# 位置は base_link 座標 [m]。z はコート面 (court.yaml の surface_z) + 半径にしておく。
+# 位置は base_link 座標 [m]。z はコート面 (court.yaml の surface_z) + 半径 (直径 60 mm なら 0.030) にしておく。
 # L0 (fake_ball_publisher): この位置をそのまま検出結果として出す
 # L1 (synthetic_camera_node): この位置にボールがあるとして、カメラ画像と深度画像を作る
 #   → ball_detector の出力とこのファイルを比べれば、検出の誤差が分かる
 
 frame_id: base_link
 balls:
-  - {type: jack, x: 0.40, y: 0.05, z: 0.0215}
-  - {type: red,  x: 0.25, y: -0.12, z: 0.0215}
-  - {type: red,  x: 0.22, y: 0.00, z: 0.0215}
-  - {type: red,  x: 0.27, y: 0.13, z: 0.0215}
+  - {type: jack, x: 0.40, y: 0.05, z: 0.030}
+  - {type: red,  x: 0.25, y: -0.12, z: 0.030}
+  - {type: red,  x: 0.22, y: 0.00, z: 0.030}
+  - {type: red,  x: 0.27, y: 0.13, z: 0.030}

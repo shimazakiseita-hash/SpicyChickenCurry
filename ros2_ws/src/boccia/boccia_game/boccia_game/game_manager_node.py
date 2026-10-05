@@ -45,12 +45,12 @@ class GameManagerNode(Node):
         # 前に拾った位置からこれ以内のボールは「同じボール」とみなして選ばない [m]
         self.declare_parameter('same_ball_radius', 0.02)
         # 置く場所と他のボールの中心がこれより近いと断る [m]
-        # 直径 43 mm + 手の中でのボールの位置のずれ (Gazebo で ±1.5 cm ほど) の余裕.
-        # 5 cm だと運んでいるボールがジャックに当たったことがある. 手 (指) が当たるかどうかは
-        # move_ball_server が MoveIt で確かめる
-        self.declare_parameter('place_clearance', 0.06)
+        # ボールの直径 (60 mm) + 手の中でのボールの位置のずれ (Gazebo で ±1.5 cm ほど) の余裕.
+        # (直径 43 mm のときに、中心どうし 5 cm で運んでいるボールがジャックに当たったことがある)
+        # 手 (指) が当たるかどうかは move_ball_server が MoveIt で確かめる
+        self.declare_parameter('place_clearance', 0.075)
         # 押し出しの道筋と他のボールの中心がこれより近いと、押している手で弾いてしまうので断る [m]
-        self.declare_parameter('push_clearance', 0.07)
+        self.declare_parameter('push_clearance', 0.08)
         # 押し出しのときに手が動く範囲 (move_ball.yaml の push_distance + push_standoff + push_contact_offset)
         self.declare_parameter('push_reach_behind', 0.12)
 

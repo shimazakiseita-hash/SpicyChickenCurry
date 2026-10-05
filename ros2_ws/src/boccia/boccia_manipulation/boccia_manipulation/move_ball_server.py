@@ -105,15 +105,15 @@ class MoveBallServer(Node):
         defaults = [
             ('arm_group', 'arm'), ('gripper_group', 'gripper'),
             ('ee_link', 'crane_x7_gripper_base_link'), ('planning_frame', 'base_link'),
-            ('approach_height', 0.13), ('grasp_height', 0.07), ('lift_height', 0.08),
-            ('gripper_open', 0.9), ('gripper_close', 0.22), ('gripper_holding', 0.31),
-            ('release_clearance', -0.002),
-            ('push_standoff', 0.02), ('push_distance', 0.05), ('push_height', 0.075),
+            ('approach_height', 0.13), ('grasp_height', 0.08), ('lift_height', 0.08),
+            ('gripper_open', 0.9), ('gripper_close', 0.43), ('gripper_holding', 0.52),
+            ('release_clearance', -0.008),
+            ('push_standoff', 0.02), ('push_distance', 0.05), ('push_height', 0.08),
             ('push_contact_offset', 0.048),
             ('velocity_scaling', 0.3), ('acceleration_scaling', 0.3),
             ('gripper_velocity_scaling', 0.1), ('push_velocity_scaling', 0.1),
             ('table_surface_z', 0.0), ('return_home', True),
-            ('court_config', ''), ('keepout_height', 0.06),
+            ('court_config', ''), ('keepout_height', 0.07),
         ]
         for name, default in defaults:
             self.declare_parameter(name, default)
@@ -181,8 +181,9 @@ class MoveBallServer(Node):
 
     def add_table_to_planning_scene(self):
         """台の上面を障害物として MoveIt に教える (台を突き抜ける計画をさせない)."""
-        # 上面を table_surface_z より少し下にする (ロボットの根元と重なって「衝突中」にならないように)
-        z = self.p['table_surface_z'] - 0.05 - 0.005
+        # 上面を table_surface_z より少し下にする. ロボットの根元と重なって「衝突中」にならないように、
+        # また置くときにボールを台に押し付ける (release_clearance) 分、手に付けたボールがめり込めるように
+        z = self.p['table_surface_z'] - 0.05 - 0.015
         self.set_box('boccia_table', (0.0, 0.0, z), (2.0, 2.0, 0.1))
 
     def set_court_keepout(self, add):
@@ -409,7 +410,7 @@ class MoveBallServer(Node):
         place_z = ball.z   # ボールの中心の高さは置いても変わらない
 
         # 他のボールと、これから動かすボールを障害物として MoveIt に教える
-        diameter = goal.ball.diameter or 0.043
+        diameter = goal.ball.diameter or self.court['ball']['diameter']
         names = [f'boccia_obstacle_{i}' for i in range(len(obstacles))]
         for name, other in zip(names, obstacles):
             self.set_ball(name, other.position, other.diameter or diameter)
