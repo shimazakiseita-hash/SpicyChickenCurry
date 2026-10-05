@@ -1,6 +1,9 @@
 # SpicyChickenCurry
 
-CRANE-X7 を ROS 2 Lyrical で動かすためのワークスペースです。
+設計製作論実習３の 「SpicyChickenCurry 」チームのリポジトリです。
+
+ロボットアーム CRANE-X7 を ROS 2 Lyrical で動かすためのワークスペースです。
+MuJoCo で動作を学習し、Gazebo（シミュレーション）や実機で動かします。
 
 ## 動作環境
 
